@@ -4,7 +4,6 @@ cli is a rust CLI tool.
 
 ## 项目
 
-
 ![alt text](./assets/image.png)
 
 ## 学什么
@@ -15,9 +14,9 @@ cli is a rust CLI tool.
 
 ![image-20241230164709940](assets/image-20241230164709940.png)
 
-## Rust基础学习
+## Rust 基础学习
 
-可以在这个网站, 学习简单的Rust语法: https://learnxinyminutes.com/rust/
+可以在这个网站, 学习简单的 Rust 语法: https://learnxinyminutes.com/rust/
 
 ![image-20241230185032851](./assets/image-20241230185032851.png)
 
@@ -53,4 +52,4 @@ cli is a rust CLI tool.
 
 ![image-20241230192610896](./assets/image-20241230192610896.png)
 
-![image-20241231154034348](assets/image-20241231154034348.png)
+![image-20241231163313103](assets/image-20241231163313103.png)
