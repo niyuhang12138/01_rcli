@@ -52,3 +52,5 @@ cli is a rust CLI tool.
 ![image-20241230192419958](./assets/image-20241230192419958.png)
 
 ![image-20241230192610896](./assets/image-20241230192610896.png)
+
+![image-20241231154034348](assets/image-20241231154034348.png)
