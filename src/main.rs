@@ -22,7 +22,7 @@ fn main() -> Result<()> {
                 opts.lowercase,
                 opts.number,
                 opts.symbol,
-            );
+            )?;
         }
     }
     Ok(())
