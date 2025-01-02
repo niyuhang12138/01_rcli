@@ -60,3 +60,5 @@ cli is a rust CLI tool.
 $ cargo run base64 decode -i Cargo.toml > fixtures/b64.txt
 // 运行上述命令将print输出到某个文件中
 ```
+
+![image-20250102110913436](assets/image-20250102110913436.png)
