@@ -1,8 +1,8 @@
-mod opts;
+mod cli;
 mod process;
 
-pub use opts::{Opts, SubCommand};
-pub use process::{process_csv, process_genpass};
+pub use cli::{Base64SubCommand, Opts, SubCommand};
+pub use process::{process_csv, process_decode, process_encode, process_genpass};
 
 #[cfg(test)]
 mod tests {
