@@ -1,11 +1,11 @@
+//! csv command
 use std::{fmt::Display, str::FromStr};
 
 use clap::Parser;
 
-use crate::{process_csv, CmdExecutor};
+use crate::{process_csv, verify_file, CmdExecutor};
 
-use super::verify_file;
-
+/// support types of output format
 #[derive(Debug, Clone, Copy)]
 pub enum OutputFormat {
     Json,
@@ -19,6 +19,7 @@ impl Display for OutputFormat {
     }
 }
 
+/// CSV command
 #[derive(Parser, Debug)]
 pub struct CsvOpts {
     /// Input file path
@@ -40,13 +41,14 @@ pub struct CsvOpts {
 
 impl CmdExecutor for CsvOpts {
     async fn execute(self) -> anyhow::Result<()> {
+        // 如果这个output这个字段没有被设置, 则使用output.{format}来作为缺省值
         let output = if let Some(output) = self.output {
             output
         } else {
             format!("output.{}", self.format)
         };
 
-        process_csv(&self.input, output, self.format)?;
+        process_csv(&self.input, output, self.format).await?;
         Ok(())
     }
 }

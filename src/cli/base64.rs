@@ -1,3 +1,4 @@
+//! base64 encode/decode commands
 use std::{
     fmt::{Debug, Display},
     str::FromStr,
@@ -6,10 +7,9 @@ use std::{
 use clap::Parser;
 use enum_dispatch::enum_dispatch;
 
-use crate::{process_decode, process_encode, CmdExecutor};
+use crate::{process_decode, process_encode, verify_file, CmdExecutor};
 
-use super::verify_file;
-
+/// base64 encode/decode commands
 #[derive(Parser, Debug)]
 #[enum_dispatch(CmdExecutor)]
 pub enum Base64SubCommand {
@@ -19,6 +19,7 @@ pub enum Base64SubCommand {
     Decode(Base64DecodeOpts),
 }
 
+/// base64 encode command
 #[derive(Parser, Debug)]
 pub struct Base64EncodeOpts {
     #[arg(short, long, value_parser = verify_file, default_value = "-")]
@@ -35,6 +36,7 @@ impl CmdExecutor for Base64EncodeOpts {
     }
 }
 
+/// base64 decode command
 #[derive(Parser, Debug)]
 pub struct Base64DecodeOpts {
     #[arg(short, long, value_parser = verify_file, default_value = "-")]
@@ -52,6 +54,7 @@ impl CmdExecutor for Base64DecodeOpts {
     }
 }
 
+/// command receiving format
 #[derive(Debug, Clone, Copy)]
 pub enum Base64Format {
     Standard,

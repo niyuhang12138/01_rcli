@@ -1,12 +1,13 @@
+//! generate a random password
 use anyhow::Result;
 use rand::seq::SliceRandom;
-// use zxcvbn::zxcvbn;
 
 const UPPER: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const LOWER: &[u8] = b"abcdefghijklmnopqrstuvwxyz";
 const NUMBER: &[u8] = b"0123456789";
 const SYMBOL: &[u8] = b"!@#$%^&*_";
 
+/// generate a random password
 pub fn process_genpass(
     length: u8,
     uppercase: bool,
@@ -17,6 +18,8 @@ pub fn process_genpass(
     let mut rng = rand::thread_rng();
     let mut password = Vec::new();
     let mut chars = Vec::new();
+
+    // the following conditional judgments guarantee that there will be at least one, which guarantees randomly generated uncertainty
 
     if uppercase {
         password.push(*UPPER.choose(&mut rng).expect("UPPER won't be empty"));
@@ -38,6 +41,7 @@ pub fn process_genpass(
         chars.extend_from_slice(SYMBOL);
     }
 
+    // generate the rest of the password
     for _ in 0..length {
         let c = chars
             .choose(&mut rng)
@@ -45,14 +49,11 @@ pub fn process_genpass(
         password.push(*c);
     }
 
+    // disrupt the order
     password.shuffle(&mut rng);
 
+    // convert to string
     let password = String::from_utf8(password)?;
-    // println!("{}", password);
-
-    // output password strength in stderr
-    // let result = zxcvbn(&password, &[]);
-    // eprintln!("Password strength: {}", result.score());
 
     Ok(password)
 }

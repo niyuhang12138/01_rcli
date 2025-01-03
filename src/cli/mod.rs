@@ -8,10 +8,9 @@ pub use self::{base64::*, csv::*, genpass::*, http::*, text::*};
 
 use clap::Parser;
 use enum_dispatch::enum_dispatch;
-use std::path::{Path, PathBuf};
 
 #[derive(Parser, Debug)]
-#[command(name = "rcli", version, author, about, long_about = None)]
+#[command(name = "rcli", version, author, about = "This is a cli with a lot of commands", long_about = None)]
 pub struct Opts {
     #[command(subcommand)]
     pub cmd: SubCommand,
@@ -30,35 +29,4 @@ pub enum SubCommand {
     Text(TextSubCommand),
     #[command(subcommand, about = "Http server")]
     Http(HttpSubCommand),
-}
-
-pub fn verify_file(filename: &str) -> Result<String, &'static str> {
-    if filename == "-" || Path::new(filename).exists() {
-        Ok(filename.into())
-    } else {
-        Err("File docs not exist")
-    }
-}
-
-pub fn verify_path(path: &str) -> Result<PathBuf, &'static str> {
-    let p = Path::new(path);
-    if p.exists() && p.is_dir() {
-        Ok(path.into())
-    } else {
-        println!("path: {path}");
-        Err("Path does not exist or is not a directory")
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_verify_input_file() {
-        assert_eq!(verify_file("-"), Ok("-".into()));
-        assert_eq!(verify_file("*"), Err("File docs not exist"));
-        assert_eq!(verify_file("Cargo.toml"), Ok("Cargo.toml".into()));
-        assert_eq!(verify_file("not-exist"), Err("File docs not exist"));
-    }
 }

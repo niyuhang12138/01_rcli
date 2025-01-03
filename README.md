@@ -68,3 +68,5 @@ $ cargo run base64 decode -i Cargo.toml > fixtures/b64.txt
 ![image-20250102204958384](./assets/image-20250102204958384.png)
 
 ![image-20250103092327726](assets/image-20250103092327726.png)
+
+![image-20250103125613959](assets/image-20250103125613959.png)

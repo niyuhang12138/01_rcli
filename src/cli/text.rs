@@ -1,17 +1,22 @@
+//! Text signature commands
 use std::{
     fmt::{Debug, Display},
     path::PathBuf,
     str::FromStr,
 };
 
+use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 use clap::Parser;
+use colored::Colorize;
 use enum_dispatch::enum_dispatch;
 use tokio::fs;
 
-use crate::{process_text_generate, process_text_sign, process_text_verify, CmdExecutor};
+use crate::{
+    get_content, get_reader, process_text_key_generate, process_text_sign, process_text_verify,
+    verify_file, verify_path, CmdExecutor,
+};
 
-use super::{verify_file, verify_path};
-
+/// Text signature commands
 #[derive(Parser, Debug)]
 #[enum_dispatch(CmdExecutor)]
 pub enum TextSubCommand {
@@ -23,6 +28,7 @@ pub enum TextSubCommand {
     Generate(TextKeyGenerateOpts),
 }
 
+/// Text signature format
 #[derive(Parser, Debug)]
 pub struct TextSignOpts {
     #[arg(short, long, value_parser = verify_file, default_value = "-")]
@@ -35,12 +41,17 @@ pub struct TextSignOpts {
 
 impl CmdExecutor for TextSignOpts {
     async fn execute(self) -> anyhow::Result<()> {
-        let signed = process_text_sign(&self.input, &self.key, self.format)?;
-        println!("{signed}");
+        let mut reader = get_reader(&self.input)?;
+        let key = get_content(&self.key)?;
+        let sig = process_text_sign(&mut reader, &key, self.format)?;
+        // base64 output
+        let encoded = URL_SAFE_NO_PAD.encode(sig);
+        println!("\n{}{}", "signer: ".bright_purple(), encoded.bright_green());
         Ok(())
     }
 }
 
+/// Text signature verify
 #[derive(Parser, Debug)]
 pub struct TextVerifyOpts {
     #[arg(short, long, value_parser = verify_file, default_value = "-")]
@@ -55,12 +66,20 @@ pub struct TextVerifyOpts {
 
 impl CmdExecutor for TextVerifyOpts {
     async fn execute(self) -> anyhow::Result<()> {
-        let verified = process_text_verify(&self.input, &self.key, self.format, &self.sig)?;
-        println!("{verified}");
+        let mut reader = get_reader(&self.input)?;
+        let key = get_content(&self.key)?;
+        let decoded = URL_SAFE_NO_PAD.decode(&self.sig)?;
+        let verified = process_text_verify(&mut reader, &key, &decoded, self.format)?;
+        if verified {
+            println!("\n{}", "✓ Signature verified".bright_green());
+        } else {
+            println!("\n{}", "⚠ Signature not verified".bright_red());
+        }
         Ok(())
     }
 }
 
+/// Text signature key generate
 #[derive(Debug, Parser)]
 pub struct TextKeyGenerateOpts {
     #[arg(short, long, default_value = "blake3", value_parser = parse_format)]
@@ -72,17 +91,9 @@ pub struct TextKeyGenerateOpts {
 
 impl CmdExecutor for TextKeyGenerateOpts {
     async fn execute(self) -> anyhow::Result<()> {
-        let keys = process_text_generate(self.format)?;
-        match self.format {
-            TextSignFormat::Black3 => {
-                let name = self.output.join("blake3.txt");
-                fs::write(name, &keys[0]).await?;
-            }
-            TextSignFormat::Ed25519 => {
-                let name = &self.output;
-                fs::write(name.join("ed25519.sk"), &keys[0]).await?;
-                fs::write(name.join("ed25519.pk"), &keys[1]).await?;
-            }
+        let key = process_text_key_generate(self.format)?;
+        for (k, v) in key {
+            fs::write(self.output.join(k), v).await?;
         }
         Ok(())
     }

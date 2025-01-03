@@ -1,12 +1,10 @@
-use std::path::PathBuf;
-
+//! http command
+use crate::{process_http_serve, verify_path, CmdExecutor};
 use clap::Parser;
 use enum_dispatch::enum_dispatch;
+use std::path::PathBuf;
 
-use crate::{process_http_serve, CmdExecutor};
-
-use super::verify_path;
-
+/// http command
 #[derive(Parser, Debug)]
 #[enum_dispatch(CmdExecutor)]
 pub enum HttpSubCommand {
@@ -14,6 +12,7 @@ pub enum HttpSubCommand {
     Serve(HttpServeOpts),
 }
 
+/// serve command
 #[derive(Parser, Debug)]
 pub struct HttpServeOpts {
     #[arg(short, long,value_parser = verify_path)]
