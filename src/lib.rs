@@ -9,6 +9,10 @@ pub use process::{
 };
 pub use utils::*;
 
+pub trait CmdExecutor {
+    fn execute(self) -> impl std::future::Future<Output = anyhow::Result<()>> + Send;
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
