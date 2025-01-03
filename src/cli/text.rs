@@ -1,17 +1,19 @@
 use std::{
     fmt::{Debug, Display},
-    fs,
     path::PathBuf,
     str::FromStr,
 };
 
 use clap::Parser;
+use enum_dispatch::enum_dispatch;
+use tokio::fs;
 
 use crate::{process_text_generate, process_text_sign, process_text_verify, CmdExecutor};
 
 use super::{verify_file, verify_path};
 
 #[derive(Parser, Debug)]
+#[enum_dispatch(CmdExecutor)]
 pub enum TextSubCommand {
     #[command(name = "sign", about = "Sign a message with a private/shared key")]
     Sign(TextSignOpts),
@@ -19,23 +21,6 @@ pub enum TextSubCommand {
     Verify(TextVerifyOpts),
     #[command(name = "generate", about = "Generate new key")]
     Generate(TextKeyGenerateOpts),
-}
-
-impl CmdExecutor for TextSubCommand {
-    async fn execute(self) -> anyhow::Result<()> {
-        match self {
-            TextSubCommand::Sign(opts) => {
-                opts.execute().await?;
-            }
-            TextSubCommand::Verify(opts) => {
-                opts.execute().await?;
-            }
-            TextSubCommand::Generate(opts) => {
-                opts.execute().await?;
-            }
-        }
-        Ok(())
-    }
 }
 
 #[derive(Parser, Debug)]
@@ -91,12 +76,12 @@ impl CmdExecutor for TextKeyGenerateOpts {
         match self.format {
             TextSignFormat::Black3 => {
                 let name = self.output.join("blake3.txt");
-                fs::write(name, &keys[0])?;
+                fs::write(name, &keys[0]).await?;
             }
             TextSignFormat::Ed25519 => {
                 let name = &self.output;
-                fs::write(name.join("ed25519.sk"), &keys[0])?;
-                fs::write(name.join("ed25519.pk"), &keys[1])?;
+                fs::write(name.join("ed25519.sk"), &keys[0]).await?;
+                fs::write(name.join("ed25519.pk"), &keys[1]).await?;
             }
         }
         Ok(())
