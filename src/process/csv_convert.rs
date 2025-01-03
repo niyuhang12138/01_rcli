@@ -62,14 +62,14 @@ mod tests {
     async fn test_process_csv() -> Result<()> {
         process_csv(
             "fixtures/juventus.csv",
-            "test.json".into(),
+            "output.json".into(),
             OutputFormat::Json,
         )
         .await?;
 
         process_csv(
             "fixtures/juventus.csv",
-            "test.yaml".into(),
+            "output.yaml".into(),
             OutputFormat::Yaml,
         )
         .await?;
